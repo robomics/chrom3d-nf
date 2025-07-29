@@ -145,7 +145,7 @@ process CHECK_SYNTAX {
 
     shell:
         '''
-        parse_samplesheet.py --detached '!{sample_sheet}' > /dev/null
+        chrom3d_nf_parse_samplesheet.py --detached '!{sample_sheet}' > /dev/null
         '''
 }
 
@@ -163,7 +163,7 @@ process CHECK_FILES {
 
     shell:
         '''
-        parse_samplesheet.py '!{sample_sheet}' > '!{sample_sheet}.ok'
+        chrom3d_nf_parse_samplesheet.py '!{sample_sheet}' > '!{sample_sheet}.ok'
         '''
 }
 

@@ -202,7 +202,7 @@ process MAKE_BEAD_GTRACK {
         }
         args=args.join(" ")
         '''
-        make_bead_file.py \\
+        chrom3d_nf_make_bead_file.py \\
             '!{sig_interactions}' \\
             '!{beads}' \\
             '!{chrom_sizes}' \\
@@ -238,7 +238,7 @@ process CHANGE_PLOIDY {
         if [ !{ploidy} -eq 1 ]; then
             cp '!{gtrack}' '!{outname}'
         else
-            change_ploidy_gtrack.py '!{gtrack}' '!{ploidy}' > '!{outname}'
+            chrom3d_nf_change_ploidy_gtrack.py '!{gtrack}' '!{ploidy}' > '!{outname}'
         fi
         '''
 }

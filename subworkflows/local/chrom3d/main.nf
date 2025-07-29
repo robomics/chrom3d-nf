@@ -62,7 +62,7 @@ process GENERATE_SEEDS {
         outname="${sample}.seeds.txt"
         files_str=files.join(" ")
         '''
-        generate_seed_sequence.py !{files_str} --number-of-seeds='!{num_seeds}' > '!{outname}'
+        chrom3d_nf_generate_seed_sequence.py !{files_str} --number-of-seeds='!{num_seeds}' > '!{outname}'
         '''
 }
 
