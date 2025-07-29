@@ -2,26 +2,26 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM mambaorg/micromamba:1.5.10-noble AS builder
+FROM python:3.13-slim AS base
 
 ARG CONTAINER_VERSION
 ARG CONTAINER_TITLE
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
-RUN micromamba install -y \
-        -c conda-forge \
-        -c bioconda \
-        'python>=3.12' \
-        'bioframe>0.7' \
+ARG PIP_NO_CACHE_DIR=0
+
+RUN apt-get update \
+&& apt-get install -y procps zstd \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN pip install \
+        'bioframe==0.8.*' \
         'pandas>2' \
-        procps-ng \
-&& micromamba clean --all -y
+        'zstandard'
 
-WORKDIR /data
+RUN python3 -c 'import bioframe,pandas,zstandard'
 
-ENV PATH="/opt/conda/bin:$PATH"
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
 CMD ["/bin/bash"]
+WORKDIR /data
 
 LABEL org.opencontainers.image.authors='Roberto Rossini <roberros@uio.no>'
 LABEL org.opencontainers.image.url='https://github.com/robomics/chrom3d-nf'

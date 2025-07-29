@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright (C) 2024 Roberto Rossini <roberros@uio.no>
 #
 # SPDX-License-Identifier: MIT
@@ -12,6 +14,12 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
+if [ "$(uname)" == "Darwin" ]; then
+  BUILD_USER="$USER"
+else
+  BUILD_USER='root'
+fi
+
 git_root="$(git rev-parse --show-toplevel)"
 img_prefix="$(git remote -v | grep push | sed -E 's/.*:(.*)\.git.*/\1/' | tr '/' '-')"
 
@@ -20,7 +28,7 @@ dockerfile_name="$(basename "${dockerfile[*]}" .Dockerfile)"
 name="$(echo "$dockerfile_name" | sed -E 's/(.*)__.*/\1/')"
 version="$(echo "$dockerfile_name" | sed -E 's/.*__v(.*)/\1/')"
 
-sudo docker build \
+sudo -u "$BUILD_USER" docker build \
   -t "$name:latest" \
   -t "$name:$version" \
   -f "$dockerfile" \
@@ -37,12 +45,12 @@ outdir="$git_root/containers/cache"
 sif="$outdir/$img_prefix-$name-$version.img"
 mkdir -p "$outdir"
 
-sudo apptainer build -F "$sif" "docker-daemon://$name:$version"
+sudo -u "$BUILD_USER" apptainer build -F "$sif" "docker-daemon://$name:$version"
 
 uid="$(id -u)"
 gid="$(id -g)"
 
-sudo chown "$uid:$gid" "$sif"
+sudo -u "$BUILD_USER" chown "$uid:$gid" "$sif"
 
 set -x
 apptainer exec "$sif" sh -c 'echo Hi!' > /dev/null
