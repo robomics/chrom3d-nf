@@ -42,11 +42,11 @@ CHROM3D_PARAMS = [
     archive_models: params.archive_models,
 ]
 
-include { SAMPLESHEET } from './subworkflows/samplesheet.nf'
-include { NCHG as NCHG_CIS } from './subworkflows/nchg.nf' params(NCHG_CIS_PARAMS)
-include { NCHG as NCHG_TRANS } from './subworkflows/nchg.nf' params(NCHG_TRANS_PARAMS)
-include { PREPROCESSING } from './subworkflows/preprocessing.nf' params(PREPROCESSING_PARAMS)
-include { CHROM3D } from './subworkflows/chrom3d.nf' params(CHROM3D_PARAMS)
+include { SAMPLESHEET } from './subworkflows/samplesheet'
+include { NCHG as NCHG_CIS } from './subworkflows/nchg' params(NCHG_CIS_PARAMS)
+include { NCHG as NCHG_TRANS } from './subworkflows/nchg' params(NCHG_TRANS_PARAMS)
+include { PREPROCESSING } from './subworkflows/preprocessing' params(PREPROCESSING_PARAMS)
+include { CHROM3D } from './subworkflows/chrom3d' params(CHROM3D_PARAMS)
 
 
 workflow {
