@@ -6,7 +6,6 @@
 import argparse
 import pathlib
 import sys
-from typing import Union
 
 import bioframe as bf
 import pandas as pd
@@ -58,7 +57,10 @@ def import_beads(path_to_beads: pathlib.Path, chrom_sizes: pd.DataFrame) -> pd.D
     return pd.concat([beads, bf.complement(beads, chrom_sizes)])[["chrom", "start", "end"]]
 
 
-def mask_chromosomes(df: pd.DataFrame, chroms: str) -> pd.DataFrame:
+def mask_chromosomes(df: pd.DataFrame | None, chroms: str) -> pd.DataFrame | None:
+    if df is None:
+        return None
+
     for chrom in chroms.split(","):
         if "chrom" in df:
             df = df[df["chrom"] != chrom]
@@ -75,7 +77,7 @@ def intersect_with_lads(beads: pd.DataFrame, lads: pd.DataFrame) -> pd.DataFrame
 
 
 def generate_gtrack(
-    beads: pd.DataFrame, sig_interactions: pd.DataFrame, lads: Union[pd.DataFrame, None]
+    beads: pd.DataFrame, sig_interactions: pd.DataFrame, lads: pd.DataFrame | None
 ) -> pd.DataFrame:
     records = {}
 
