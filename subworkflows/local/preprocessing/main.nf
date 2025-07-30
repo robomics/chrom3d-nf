@@ -78,10 +78,10 @@ workflow PREPROCESSING {
             .join(beads)
             .join(lads)
             .join(MERGE.out.tsv)
-            .set { make_bead_gtrak_tasks }
+            .set { make_bead_gtrack_tasks }
 
         MAKE_BEAD_GTRACK(
-            make_bead_gtrak_tasks,
+            make_bead_gtrack_tasks,
             masked_chromosomes
         )
 
