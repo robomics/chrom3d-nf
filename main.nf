@@ -61,6 +61,7 @@ workflow {
       params.hic_file,
       params.resolution,
       params.beads,
+      params.lads,
       params.mask
     )
 

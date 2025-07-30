@@ -40,6 +40,7 @@ workflow SAMPLESHEET {
     hic_file
     resolution
     domains
+    lads
     mask
 
   main:
@@ -60,6 +61,7 @@ workflow SAMPLESHEET {
         hic_file,
         resolution,
         domains ? domains : "",
+        lads ? lads : "",
         mask ? mask : ""
       )
 
@@ -108,6 +110,7 @@ process GENERATE {
     val hic_file
     val resolution
     val domains
+    val lads
     val mask
 
   output:
@@ -123,12 +126,16 @@ process GENERATE {
       fi
     done
 
-    printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > sample_sheet.tsv
-    printf '%s\\t%s\\t%s\\t%s\\t%s\\n' '!{sample}' \\
+    printf 'sample\\thic_file\\tresolution\\tdomains\\tlads\\tmask_cis\\tmask_trans\\n' > sample_sheet.tsv
+    printf '%s\\t%s\\t%s\\t%s\\t%s\\t%s\\t%s\\n' \\
+           '$sample' \\
            '$hic_file' \\
            '$resolution' \\
            '$domains' \\
-           '$mask' >> sample_sheet.tsv
+           '$lads' \\
+           '$mask' \\
+           '$mask' |
+    tee -a sample_sheet.tsv
     """
 }
 
