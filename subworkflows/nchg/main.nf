@@ -14,19 +14,41 @@ workflow NCHG {
 
     take:
         sample_sheet
+
+        // masking
         mad_max
         bad_bin_fraction
-
         cytoband
         gaps
+
+        // cis
+        use_cis_interactions
+        fdr_cis
+        log_ratio_cis
+
+        // trans
+        use_trans_interactions
+        fdr_trans
+        log_ratio_trans
+
+        // plotting
+        skip_expected_plots
+        skip_sign_interaction_plots
+        hic_tgt_resolution_plots
+        plot_sig_interactions_cmap_lb
+        plot_sig_interactions_cmap_ub
+        plot_format
+
+        // misc
+        zstd_compression_lvl
 
     main:
 
         interaction_types = []
-        if (params.use_cis_interactions) {
+        if (use_cis_interactions) {
             interaction_types.add("cis")
         }
-        if (params.use_trans_interactions) {
+        if (use_trans_interactions) {
             interaction_types.add("trans")
         }
 
@@ -54,7 +76,7 @@ workflow NCHG {
             bin_masks,
             make_optional_input(cytoband),
             make_optional_input(gaps),
-            params.zstd_compression_lvl
+            zstd_compression_lvl
         )
 
         hic_files
@@ -149,8 +171,8 @@ workflow NCHG {
             .map { tuple(it[0],
                          it[1],
                          it[2],
-                         params.fdr_cis,
-                         params.log_ratio_cis)
+                         fdr_cis,
+                         log_ratio_cis)
             }
             .set { nchg_filter_cis_tasks }
 
@@ -158,8 +180,8 @@ workflow NCHG {
             .map { tuple(it[0],
                          it[1],
                          it[2],
-                         params.fdr_trans,
-                         params.log_ratio_trans)
+                         fdr_trans,
+                         log_ratio_trans)
             }
             .set { nchg_filter_trans_tasks }
 
@@ -198,18 +220,18 @@ workflow NCHG {
             nchg_view_tasks
         )
 
-        if (!params.skip_expected_plots) {
+        if (!skip_expected_plots) {
             PLOT_EXPECTED(
                 EXPECTED.out.h5,
                 interaction_types,
-                params.plot_format
+                plot_format
             )
         }
 
-        if (!params.skip_sign_interaction_plots) {
+        if (!skip_sign_interaction_plots) {
             GET_HIC_PLOT_RESOLUTION(
                 hic_files,
-                params.hic_tgt_resolution_plots
+                hic_tgt_resolution_plots
             )
 
             GET_HIC_PLOT_RESOLUTION.out.tsv
@@ -224,20 +246,20 @@ workflow NCHG {
                 .join(VIEW.out.tsv)
                 .set { plotting_tasks }
 
-            def plot_sig_interactions_cmap_lb = params.plot_sig_interactions_cmap_lb
-            if (!params.plot_sig_interactions_cmap_lb) {
-                plot_sig_interactions_cmap_lb = Math.min(params.log_ratio_cis,
-                                                         params.log_ratio_trans)
+            def plot_sig_interactions_cmap_lb = plot_sig_interactions_cmap_lb
+            if (!plot_sig_interactions_cmap_lb) {
+                plot_sig_interactions_cmap_lb = Math.min(log_ratio_cis,
+                                                         log_ratio_trans)
             }
 
             def plot_sig_interactions_cmap_ub = Math.max(plot_sig_interactions_cmap_lb,
-                                                         params.plot_sig_interactions_cmap_ub)
+                                                         plot_sig_interactions_cmap_ub)
 
             PLOT_SIGNIFICANT(
                plotting_tasks,
                plot_sig_interactions_cmap_lb,
                plot_sig_interactions_cmap_ub,
-               params.plot_format
+               plot_format
             )
 
             PLOT_EXPECTED.out.plots
@@ -656,7 +678,7 @@ process PLOT_EXPECTED {
 
     output:
         tuple val(sample),
-              path("*.${params.plot_format}"),
+              path("*.${plot_format}"),
         emit: plots
 
     script:
@@ -739,7 +761,7 @@ process PLOT_SIGNIFICANT {
 
     output:
         tuple val(sample),
-              path("*.${params.plot_format}"),
+              path("*.${plot_format}"),
         emit: plots
 
     script:

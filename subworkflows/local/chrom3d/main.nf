@@ -9,6 +9,7 @@ workflow CHROM3D {
         beads
         args
         number_of_models
+        archive_models
 
     main:
 
@@ -33,7 +34,7 @@ workflow CHROM3D {
             args
         )
 
-        if (params.archive_models) {
+        if (archive_models) {
             ARCHIVE(
                 SIMULATE.out.cmm.groupTuple()
             )

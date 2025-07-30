@@ -1,56 +1,20 @@
 #!/usr/bin/env nextflow
+
 // Copyright (C) 2024 Roberto Rossini <roberros@uio.no>
 //
 // SPDX-License-Identifier: MIT
 
 nextflow.enable.dsl=2
 
-params.publish_dir = params.outdir
-
-NCHG_PARAMS = [
-    publish_dir: "${params.outdir}/nchg/",
-    publish_dir_mode: params.publish_dir_mode,
-    use_cis_interactions: true,
-    use_trans_interactions: true,
-    zstd_compression_lvl: params.zstd_compression_lvl,
-    fdr_cis: params.nchg_fdr_cis,
-    fdr_trans: params.nchg_fdr_trans,
-    log_ratio_cis: params.nchg_log_ratio_cis,
-    log_ratio_trans: params.nchg_log_ratio_trans,
-    plot_format: params.plot_format,
-    hic_tgt_resolution_plots: 500000,
-    plot_sig_interactions_cmap_lb: null,
-    plot_sig_interactions_cmap_ub: 2.0,
-    skip_expected_plots: params.nchg_skip_plots,
-    skip_sign_interaction_plots: params.nchg_skip_plots,
-]
-
-NCHG_CIS_PARAMS = NCHG_PARAMS.clone()
-NCHG_CIS_PARAMS["use_trans_interactions"] = false
-
-NCHG_TRANS_PARAMS = NCHG_PARAMS.clone()
-NCHG_TRANS_PARAMS["use_cis_interactions"] = false
-
-PREPROCESSING_PARAMS = [
-    publish_dir: params.outdir,
-    publish_dir_mode: params.publish_dir_mode,
-]
-
-CHROM3D_PARAMS = [
-    publish_dir: "${params.outdir}/chrom3d/",
-    publish_dir_mode: params.publish_dir_mode,
-    archive_models: params.archive_models,
-]
 
 include { SAMPLESHEET } from './subworkflows/local/samplesheet'
-include { NCHG as NCHG_CIS } from './subworkflows/nchg' params(NCHG_CIS_PARAMS)
-include { NCHG as NCHG_TRANS } from './subworkflows/nchg' params(NCHG_TRANS_PARAMS)
-include { PREPROCESSING } from './subworkflows/local/preprocessing' params(PREPROCESSING_PARAMS)
-include { CHROM3D } from './subworkflows/local/chrom3d' params(CHROM3D_PARAMS)
+include { NCHG as NCHG_CIS } from './subworkflows/nchg'
+include { NCHG as NCHG_TRANS } from './subworkflows/nchg'
+include { PREPROCESSING } from './subworkflows/local/preprocessing'
+include { CHROM3D } from './subworkflows/local/chrom3d'
 
 
 workflow {
-
     log.info("-- PARAMETERS")
     log.info("")
     if (params.sample_sheet) {
@@ -63,7 +27,6 @@ workflow {
         log.info("-- lads: ${params.lads}")
         log.info("-- mask: ${params.mask}")
     }
-    log.info("-- outdir: ${params.outdir}")
     log.info("-- publish_dir_mode: ${params.publish_dir_mode}")
 
     log.info("-- cytoband: ${params.cytoband}")
@@ -84,6 +47,9 @@ workflow {
 
     log.info("-- plot_format: ${params.plot_format}")
     log.info("-- nchg_skip_plots: ${params.nchg_skip_plots}")
+    log.info("-- nchg_hic_tgt_resolution_plots: ${params.nchg_hic_tgt_resolution_plots}")
+    log.info("-- nchg_plot_sig_interactions_cmap_lb: ${params.nchg_plot_sig_interactions_cmap_lb}")
+    log.info("-- nchg_plot_sig_interactions_cmap_ub: ${params.nchg_plot_sig_interactions_cmap_ub}")
 
     log.info("")
 
@@ -105,7 +71,20 @@ workflow {
         params.nchg_mad_max,
         params.nchg_bad_bin_fraction,
         params.cytoband,
-        params.assembly_gaps
+        params.assembly_gaps,
+        true,  // use_cis_interactions
+        params.nchg_fdr_cis,
+        params.nchg_log_ratio_cis,
+        false, // use_trans_interactions
+        params.nchg_fdr_trans,
+        params.nchg_log_ratio_trans,
+        params.nchg_skip_plots,  // skip_expected_plots
+        params.nchg_skip_plots,  // skip_sign_interaction_plots
+        params.nchg_hic_tgt_resolution_plots,
+        params.nchg_plot_sig_interactions_cmap_lb,
+        params.nchg_plot_sig_interactions_cmap_ub,
+        params.plot_format,
+        params.zstd_compression_lvl
     )
 
     NCHG_TRANS(
@@ -113,7 +92,20 @@ workflow {
         params.nchg_mad_max,
         params.nchg_bad_bin_fraction,
         params.cytoband,
-        params.assembly_gaps
+        params.assembly_gaps,
+        false, // use_cis_interactions
+        params.nchg_fdr_cis,
+        params.nchg_log_ratio_cis,
+        true,  // use_trans_interactions
+        params.nchg_fdr_trans,
+        params.nchg_log_ratio_trans,
+        params.nchg_skip_plots,  // skip_expected_plots
+        params.nchg_skip_plots,  // skip_sign_interaction_plots
+        params.nchg_hic_tgt_resolution_plots,
+        params.nchg_plot_sig_interactions_cmap_lb,
+        params.nchg_plot_sig_interactions_cmap_ub,
+        params.plot_format,
+        params.zstd_compression_lvl
     )
 
     NCHG_CIS.out.tsv
@@ -141,7 +133,8 @@ workflow {
     CHROM3D(
         PREPROCESSING.out.gtrack,
         params.chrom3d_args,
-        params.number_of_models
+        params.number_of_models,
+        params.archive_models
     )
 
 }
