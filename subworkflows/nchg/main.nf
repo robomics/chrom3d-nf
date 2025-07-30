@@ -44,7 +44,7 @@ workflow NCHG {
 
     main:
 
-        interaction_types = []
+        def interaction_types = []
         if (use_cis_interactions) {
             interaction_types.add("cis")
         }
@@ -246,14 +246,13 @@ workflow NCHG {
                 .join(VIEW.out.tsv)
                 .set { plotting_tasks }
 
-            def plot_sig_interactions_cmap_lb = plot_sig_interactions_cmap_lb
             if (!plot_sig_interactions_cmap_lb) {
                 plot_sig_interactions_cmap_lb = Math.min(log_ratio_cis,
                                                          log_ratio_trans)
             }
 
-            def plot_sig_interactions_cmap_ub = Math.max(plot_sig_interactions_cmap_lb,
-                                                         plot_sig_interactions_cmap_ub)
+            plot_sig_interactions_cmap_ub = Math.max(plot_sig_interactions_cmap_lb,
+                                                     plot_sig_interactions_cmap_ub)
 
             PLOT_SIGNIFICANT(
                plotting_tasks,

@@ -112,14 +112,14 @@ workflow {
 
       NCHG_CIS.out.tsv
           .map {
-              sample = it[0] - ~/_cis$/
+              def sample = it[0] - ~/_cis$/
               tuple(sample, it[1])
           }
           .set { nchg_sig_interactions_cis }
 
       NCHG_TRANS.out.tsv
           .map {
-              sample = it[0] - ~/_trans$/
+              def sample = it[0] - ~/_trans$/
               tuple(sample, it[1])
           }
           .set { nchg_sig_interactions_trans }

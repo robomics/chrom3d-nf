@@ -24,21 +24,24 @@ workflow PREPROCESSING {
 
         sample_sheet
             .splitCsv(sep: "\t", header: true)
-            .map { row -> tuple(row.sample,
-                                file(row.hic_file, checkIfExists: true),
-                                row.resolution)
+            .map { row ->
+                tuple(row.sample,
+                      file(row.hic_file, checkIfExists: true),
+                      row.resolution)
             }
             .set { hic_files }
 
         sample_sheet
             .splitCsv(sep: "\t", header: true)
-            .map { row -> tuple(row.sample, make_optional_input(row.domains))
+            .map { row ->
+                tuple(row.sample, make_optional_input(row.domains))
             }
             .set { domains }
 
         sample_sheet
             .splitCsv(sep: "\t", header: true)
-            .map { row -> tuple(row.sample, make_optional_input(row.lads))
+            .map { row ->
+                tuple(row.sample, make_optional_input(row.lads))
             }
             .set { lads }
 
@@ -60,8 +63,8 @@ workflow PREPROCESSING {
 
         domains.join(DUMP_BINS.out.bed)
             .map {
-                doms = it[1]
-                bins = it[2]
+                def doms = it[1]
+                def bins = it[2]
 
                 if (doms.size() == 0) {
                     doms = bins

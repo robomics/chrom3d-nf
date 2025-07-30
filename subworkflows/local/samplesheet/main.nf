@@ -15,13 +15,13 @@ def make_optional_input(path) {
 }
 
 def parse_sample_sheet_row(row) {
-    hic_fname = strip_resolution_from_cooler_uri(row.hic_file)
-    files = [hic_fname]
+    def hic_fname = strip_resolution_from_cooler_uri(row.hic_file)
+    def files = [hic_fname]
 
-    domains = make_optional_input(row.domains)
-    lads = make_optional_input(row.lads)
-    mask_cis = make_optional_input(row.mask_cis)
-    mask_trans = make_optional_input(row.mask_trans)
+    def domains = make_optional_input(row.domains)
+    def lads = make_optional_input(row.lads)
+    def mask_cis = make_optional_input(row.mask_cis)
+    def mask_trans = make_optional_input(row.mask_trans)
 
     tuple(row.sample,
           files,
@@ -70,10 +70,10 @@ workflow SAMPLESHEET {
 
         sample_sheet
             .splitCsv(sep: "\t", header: true)
-            .map {
-                    it = parse_sample_sheet_row(it)
-                    // Concatenate path to coolers and optional files
-                    it[1] + it[2] + it[3] + it[4] + it[5]
+            .map { row ->
+                   def toks = parse_sample_sheet_row(row)
+                   // Concatenate path to coolers and optional files
+                   toks[1] + toks[2] + toks[3] + toks[4] + toks[5]
             }
             .flatten()
             .unique()

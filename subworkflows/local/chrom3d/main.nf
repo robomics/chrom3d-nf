@@ -21,7 +21,7 @@ workflow CHROM3D {
         GENERATE_SEEDS.out.txt
             .splitText()
             .map {
-                toks = it[1].trim().split("\t")
+                def toks = it[1].trim().split("\t")
                 tuple(it[0], toks[0], toks[1])
             }
             .set { seeds }
@@ -35,9 +35,7 @@ workflow CHROM3D {
         )
 
         if (archive_models) {
-            ARCHIVE(
-                SIMULATE.out.cmm.groupTuple()
-            )
+            ARCHIVE(SIMULATE.out.cmm.groupTuple())
             ARCHIVE.out.tar.set { models_tar }
             Channel.empty().set { models }
         } else {
