@@ -172,42 +172,42 @@ output {
     nchg_cis_parquet {
         path {
           def sample = it[0] - ~/_cis$/
-          "$sample/"
+          "$sample/nchg/"
         }
         mode params.publish_dir_mode
     }
     nchg_cis_expected {
         path {
           def sample = it[0] - ~/_cis$/
-          "$sample/"
+          "$sample/nchg/"
         }
         mode params.publish_dir_mode
     }
     nchg_cis_plots {
         path {
           def sample = it[0] - ~/_cis$/
-          "$sample/plots/"
+          "$sample/nchg/plots/"
         }
         mode params.publish_dir_mode
     }
     nchg_trans_parquet {
         path {
           def sample = it[0] - ~/_trans$/
-          "$sample/"
+          "$sample/nchg/"
         }
         mode params.publish_dir_mode
     }
     nchg_trans_expected {
         path {
           def sample = it[0] - ~/_trans$/
-          "$sample/"
+          "$sample/nchg/"
         }
         mode params.publish_dir_mode
     }
     nchg_trans_plots {
         path {
           def sample = it[0] - ~/_trans$/
-          "$sample/plots/"
+          "$sample/nchg/plots/"
         }
         mode params.publish_dir_mode
     }
