@@ -1,32 +1,28 @@
-# Copyright (C) 2024 Roberto Rossini <roberros@uio.no>
+# Copyright (C) 2025 Roberto Rossini <roberros@uio.no>
 #
 # SPDX-License-Identifier: MIT
 
-FROM mambaorg/micromamba:1.5.10-noble AS builder
-
 ARG CONTAINER_VERSION
+
+FROM paulsengroup/hictk:${CONTAINER_VERSION} AS base
+
 ARG CONTAINER_TITLE
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
+ARG CONTAINER_VERSION
 
-RUN micromamba install -y \
-        -c conda-forge \
-        -c bioconda \
-        'python>=3.12' \
-        'bioframe>0.7' \
-        'pandas>2' \
-        procps-ng \
-&& micromamba clean --all -y
+RUN apt-get update \
+&& apt-get install -y procps \
+&& rm -rf /var/lib/apt/lists/*
 
-WORKDIR /data
+RUN hictk --help
 
-ENV PATH="/opt/conda/bin:$PATH"
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+ENTRYPOINT []
 CMD ["/bin/bash"]
+WORKDIR /data
 
 LABEL org.opencontainers.image.authors='Roberto Rossini <roberros@uio.no>'
 LABEL org.opencontainers.image.url='https://github.com/robomics/chrom3d-nf'
 LABEL org.opencontainers.image.documentation='https://github.com/robomics/chrom3d-nf'
 LABEL org.opencontainers.image.source='https://github.com/robomics/chrom3d-nf'
 LABEL org.opencontainers.image.licenses='MIT'
-LABEL org.opencontainers.image.title="${CONTAINER_TITLE:-py-utils}"
+LABEL org.opencontainers.image.title="${CONTAINER_TITLE:-hictk}"
 LABEL org.opencontainers.image.version="${CONTAINER_VERSION:-latest}"

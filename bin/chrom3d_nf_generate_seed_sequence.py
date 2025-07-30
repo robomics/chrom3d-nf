@@ -34,7 +34,12 @@ def make_cli() -> argparse.ArgumentParser:
         default=50,
         help="Number of seeds to generate.",
     )
-    cli.add_argument("--sep", type=str, default="\n", help="Seed separator.")
+    cli.add_argument(
+        "--sep",
+        type=str,
+        default="\n",
+        help="Seed separator.",
+    )
     cli.add_argument(
         "--lower-bound",
         type=int,
@@ -62,6 +67,29 @@ def hash_files(files: List[pathlib.Path], chunk_size: int = 64 * 1024 * 1024) ->
     return hasher.hexdigest()
 
 
+def generate_seeds(lb: int, ub: int, num_seeds: int) -> List[int]:
+    """
+    Generate a sequence of seeds ensuring that there are no duplicate seeds, and that the resulting
+    sequence has a deterministic (but random-looking) order
+    """
+    seeds = set()
+    while len(seeds) != num_seeds:
+        seeds.add(random.randint(lb, ub))
+
+    seeds = list(sorted(seeds))
+    random.shuffle(seeds)
+
+    return seeds
+
+
+def print_seeds(seeds: List[int], sep: str):
+    padding = len(str(len(seeds)))
+
+    # prints something like 012    1234567890
+    seeds_str = (f"{i:0{padding}d}\t{n}" for i, n in enumerate(seeds))
+    print(sep.join(seeds_str))
+
+
 def main():
     args = vars(make_cli().parse_args())
 
@@ -69,14 +97,12 @@ def main():
 
     random.seed(digest, version=2)
 
-    lb = args["lower_bound"]
-    ub = args["upper_bound"]
-
-    num_seeds = args["number_of_seeds"]
-    num_seeds_str_length = len(str(num_seeds))
-
-    seeds = (f"{i:0{num_seeds_str_length}d}\t{random.randint(lb, ub)}" for i in range(num_seeds))
-    print(args["sep"].join(seeds))
+    seeds = generate_seeds(
+        lb=args["lower_bound"],
+        ub=args["upper_bound"],
+        num_seeds=args["number_of_seeds"],
+    )
+    print_seeds(seeds, args["sep"])
 
 
 if __name__ == "__main__":

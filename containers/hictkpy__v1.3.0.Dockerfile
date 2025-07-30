@@ -2,24 +2,25 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM mambaorg/micromamba:1.5.10-noble AS builder
+FROM python:3.13-slim AS base
 
 ARG CONTAINER_VERSION
 ARG CONTAINER_TITLE
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
-RUN micromamba install -y \
-        -c conda-forge \
-        -c bioconda \
-        "hictkpy=$CONTAINER_VERSION" \
-        procps-ng \
-&& micromamba clean --all -y
+ARG PIP_NO_CACHE_DIR=0
 
-WORKDIR /data
+RUN apt-get update \
+&& apt-get install -y procps \
+&& rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/opt/conda/bin:$PATH"
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+RUN pip install \
+    "hictkpy[all]==$CONTAINER_VERSION" \
+    'zstandard'
+
+RUN python3 -c 'import hictkpy'
+
 CMD ["/bin/bash"]
+WORKDIR /data
 
 LABEL org.opencontainers.image.authors='Roberto Rossini <roberros@uio.no>'
 LABEL org.opencontainers.image.url='https://github.com/robomics/chrom3d-nf'

@@ -7,22 +7,22 @@ index e9518cc..32315f7 100644
  #include <limits>
  #include <stdexcept>
 +#include <string>
- 
+
  #include <sstream>
- 
+
 @@ -18,9 +19,6 @@
- 
+
  #include "../src/tclap-1.2.1/include/tclap/CmdLine.h"
- 
+
 -#define SSTR( x ) dynamic_cast< std::ostringstream & >( \
 -        ( std::ostringstream() << std::dec << x ) ).str()
 -
  using namespace std;
- 
+
  struct Args {
 @@ -194,11 +192,11 @@ int main(int argc, char** argv) {
    //model.buildHashMap();
- 
+
    MCMC mcmc(model);
 -  bool success;
 -  uint Niter=args.nIter;
@@ -31,9 +31,9 @@ index e9518cc..32315f7 100644
    double temp=maxTemp;
 +  bool success;
 +  (void)success; // [[maybe_unused]]
- 
+
    uint verbosity = (args.verbose == 0) ? args.nIter+1 : args.verbose;
- 
+
 @@ -215,7 +213,7 @@ cerr << "0 " << model.getLossScore() << endl;
      assert(success);
      if (i % verbosity == 0) {
@@ -77,8 +77,8 @@ index 4e738b5..358a089 100644
    virtual Move randomize(Chromosome&, ENG&) = 0;
 +  virtual ~Randomizer() noexcept = default;
  };
- 
- 
+
+
 diff --git a/src/Util.h b/src/Util.h
 index 0116f65..5875dd9 100644
 --- a/src/Util.h
@@ -90,5 +90,5 @@ index 0116f65..5875dd9 100644
 -    const char* what(){return "Unacceptable move!";}
 +    virtual const char* what() const noexcept {return "Unacceptable move!";}
    };
- 
+
  }
