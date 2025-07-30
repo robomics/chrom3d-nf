@@ -76,9 +76,7 @@ def intersect_with_lads(beads: pd.DataFrame, lads: pd.DataFrame) -> pd.DataFrame
     return df[beads.columns.tolist()]
 
 
-def generate_gtrack(
-    beads: pd.DataFrame, sig_interactions: pd.DataFrame, lads: pd.DataFrame | None
-) -> pd.DataFrame:
+def generate_gtrack(beads: pd.DataFrame, sig_interactions: pd.DataFrame, lads: pd.DataFrame | None) -> pd.DataFrame:
     records = {}
 
     for chrom1, start1, end1, chrom2, start2, end2 in sig_interactions.itertuples(index=False):
