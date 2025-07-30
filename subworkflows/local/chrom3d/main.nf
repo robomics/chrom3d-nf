@@ -64,12 +64,12 @@ process GENERATE_SEEDS {
         tuple val(sample),
               path(outname), emit: txt
 
-    shell:
+    script:
         outname="${sample}.seeds.txt"
         files_str=files.join(" ")
-        '''
-        chrom3d_nf_generate_seed_sequence.py !{files_str} --number-of-seeds='!{num_seeds}' > '!{outname}'
-        '''
+        """
+        chrom3d_nf_generate_seed_sequence.py $files_str --number-of-seeds='$num_seeds' > '$outname'
+        """
 }
 
 process SIMULATE {
@@ -90,15 +90,15 @@ process SIMULATE {
               path("*.cmm"),
         emit: cmm
 
-    shell:
+    script:
         outname="${beads.simpleName}_${id}.cmm"
         args_str=args.join(" ")
-        '''
-        Chrom3D -o '!{outname}' \\
-                -s '!{seed}' \\
-                --nucleus '!{beads}' \\
-                !{args}
-        '''
+        """
+        Chrom3D -o '$outname' \\
+                -s '$seed' \\
+                --nucleus '$beads' \\
+                $args
+        """
 }
 
 process ARCHIVE {
@@ -113,9 +113,9 @@ process ARCHIVE {
               path(outname),
         emit: tar
 
-    shell:
+    script:
         outname="${sample}.models.tar.gz"
-        '''
-        tar --transform 's,^,!{sample}/,' -chzf '!{outname}' *.cmm
-        '''
+        """
+        tar --transform 's,^,$sample/,' -chzf '$outname' *.cmm
+        """
 }

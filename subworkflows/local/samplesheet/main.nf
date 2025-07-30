@@ -113,23 +113,23 @@ process GENERATE {
     output:
         path "sample_sheet.tsv", emit: tsv
 
-    shell:
-        '''
-        for param in '!{sample}' '!{hic_file}' '!{resolution}'; do
-            if [[ "$param" == 'null' ]]; then
+    script:
+        """
+        for param in '$sample' '$hic_file' '$resolution'; do
+            if [[ "\$param" == 'null' ]]; then
                 2>&1 echo 'Parameters sample, hic_file is required when no samplesheet is provided!'
-                2>&1 echo "sample='!{sample}'; hic_file='!{hic_file}'; resolution='!{resolution}'"
+                2>&1 echo "sample='$sample'; hic_file='$hic_file'; resolution='$resolution'"
                 exit 1
             fi
         done
 
         printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > sample_sheet.tsv
         printf '%s\\t%s\\t%s\\t%s\\t%s\\n' '!{sample}' \\
-                                 '!{hic_file}' \\
-                                 '!{resolution}' \\
-                                 '!{domains}' \\
-                                 '!{mask}' >> sample_sheet.tsv
-        '''
+                                 '$hic_file' \\
+                                 '$resolution' \\
+                                 '$domains' \\
+                                 '$mask' >> sample_sheet.tsv
+        """
 }
 
 process CHECK_SYNTAX {
@@ -143,10 +143,10 @@ process CHECK_SYNTAX {
     output:
         path "${sample_sheet}", includeInputs: true, emit: tsv
 
-    shell:
-        '''
-        chrom3d_nf_parse_samplesheet.py --detached '!{sample_sheet}' > /dev/null
-        '''
+    script:
+        """
+        chrom3d_nf_parse_samplesheet.py --detached '$sample_sheet' > /dev/null
+        """
 }
 
 process CHECK_FILES {
@@ -161,11 +161,11 @@ process CHECK_FILES {
     output:
         path outname, emit: tsv
 
-    shell:
+    script:
         outname="${sample_sheet.baseName}.ok.tsv"
-        '''
-        chrom3d_nf_parse_samplesheet.py '!{sample_sheet}' > '!{outname}'
-        '''
+        """
+        chrom3d_nf_parse_samplesheet.py '$sample_sheet' > '$outname'
+        """
 }
 
 process NCHG_CIS {
@@ -179,17 +179,17 @@ process NCHG_CIS {
     output:
         path outname, emit: tsv
 
-    shell:
+    script:
         basename="$sample_sheet" - ~/\.ok\.tsv$/
         outname="${basename}.nchg.cis.tsv"
-        '''
-        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > '!{outname}'
+        """
+        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > '$outname'
         # Drop LADs column
-        cut -f 1-4,6 '!{sample_sheet}' |
+        cut -f 1-4,6 '$sample_sheet' |
             tail -n +2 |
             perl -pe 's/^(.*?)\\t/\\1_cis\\t/' \\
-            >> '!{outname}'
-        '''
+            >> '$outname'
+        """
 }
 
 process NCHG_TRANS {
@@ -203,15 +203,15 @@ process NCHG_TRANS {
     output:
         path outname, emit: tsv
 
-    shell:
+    script:
         basename="$sample_sheet" - ~/\.ok\.tsv$/
         outname="${basename}.nchg.trans.tsv"
-        '''
-        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > '!{outname}'
+        """
+        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > '$outname'
         # Drop LADs column
-        cut -f 1-4,7 '!{sample_sheet}' |
+        cut -f 1-4,7 '$sample_sheet' |
             tail -n +2 |
             perl -pe 's/^(.*?)\\t/\\1_trans\\t/' \\
-            >> '!{outname}'
-        '''
+            >> '$outname'
+        """
 }

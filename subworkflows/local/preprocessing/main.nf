@@ -113,20 +113,20 @@ process MERGE {
               path(outname),
         emit: tsv
 
-    shell:
+    script:
         outname="${sample}.sig_interactions.tsv.gz"
-        '''
+        """
         #!/usr/bin/env python3
 
         import pandas as pd
 
-        paths = "!{interactions}".split(" ")
+        paths = "$interactions".split(" ")
         dfs = [pd.read_table(p) for p in paths]
 
         df = pd.concat(dfs).sort_values(["chrom1", "start1", "chrom2", "start2"])
 
-        df.to_csv("!{outname}", sep="\\t", header=True, index=False, compression="gzip")
-        '''
+        df.to_csv("$outname", sep="\\t", header=True, index=False, compression="gzip")
+        """
 }
 
 process DUMP_CHROM_SIZES {
@@ -145,11 +145,11 @@ process DUMP_CHROM_SIZES {
               path(outname),
         emit: chrom_sizes
 
-    shell:
+    script:
         outname="${sample}.chrom.sizes"
-        '''
-        hictk dump -t chroms '!{hic_file}' > '!{outname}'
-        '''
+        """
+        hictk dump -t chroms '$hic_file' > '$outname'
+        """
 }
 
 process DUMP_BINS {
@@ -168,11 +168,11 @@ process DUMP_BINS {
               path(outname),
         emit: bed
 
-    shell:
+    script:
         outname="${sample}.bins.bed"
-        '''
-        hictk dump -t bins '!{hic_file}' --resolution '!{resolution}' > '!{outname}'
-        '''
+        """
+        hictk dump -t bins '$hic_file' --resolution '$resolution' > '$outname'
+        """
 }
 
 process MAKE_BEAD_GTRACK {
@@ -195,7 +195,7 @@ process MAKE_BEAD_GTRACK {
               path("*.gtrack"),
         emit: gtrack
 
-    shell:
+    script:
         outprefix="${sample}"
         args = []
         if (!lads.toString().isEmpty()) {
@@ -205,14 +205,14 @@ process MAKE_BEAD_GTRACK {
             args.push("--masked-chromosomes='${masked_chromosomes}'")
         }
         args=args.join(" ")
-        '''
+        """
         chrom3d_nf_make_bead_file.py \\
-            '!{sig_interactions}' \\
-            '!{beads}' \\
-            '!{chrom_sizes}' \\
-            !{args} \\
-            > '!{sample}.beads.gtrack'
-        '''
+            '$sig_interactions' \\
+            '$beads' \\
+            '$chrom_sizes' \\
+            $args \\
+            > '$sample'.beads.gtrack
+        """
 }
 
 process CHANGE_PLOIDY {
@@ -232,13 +232,13 @@ process CHANGE_PLOIDY {
               path("*.gtrack"),
         emit: gtrack
 
-    shell:
+    script:
         outname="${gtrack.baseName}.${ploidy}.gtrack"
-        '''
-        if [ !{ploidy} -eq 1 ]; then
-            cp '!{gtrack}' '!{outname}'
+        """
+        if [ '$ploidy' -eq 1 ]; then
+            cp '$gtrack' '$outname'
         else
-            chrom3d_nf_change_ploidy_gtrack.py '!{gtrack}' '!{ploidy}' > '!{outname}'
+            chrom3d_nf_change_ploidy_gtrack.py '$gtrack' '$ploidy' > '$outname'
         fi
-        '''
+        """
 }
