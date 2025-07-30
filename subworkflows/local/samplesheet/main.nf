@@ -159,11 +159,12 @@ process CHECK_FILES {
         path files
 
     output:
-        path "*.ok", emit: tsv
+        path outname, emit: tsv
 
     shell:
+        outname="${sample_sheet.baseName}.ok.tsv"
         '''
-        chrom3d_nf_parse_samplesheet.py '!{sample_sheet}' > '!{sample_sheet}.ok'
+        chrom3d_nf_parse_samplesheet.py '!{sample_sheet}' > '!{outname}'
         '''
 }
 
@@ -176,16 +177,18 @@ process NCHG_CIS {
         path sample_sheet
 
     output:
-        path "*.tsv", emit: tsv
+        path outname, emit: tsv
 
     shell:
+        basename="$sample_sheet" - ~/\.ok\.tsv$/
+        outname="${basename}.nchg.cis.tsv"
         '''
-        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > sample_sheet.cis.nchg.tsv
+        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > '!{outname}'
         # Drop LADs column
         cut -f 1-4,6 '!{sample_sheet}' |
             tail -n +2 |
             perl -pe 's/^(.*?)\\t/\\1_cis\\t/' \\
-            >> sample_sheet.cis.nchg.tsv
+            >> '!{outname}'
         '''
 }
 
@@ -198,15 +201,17 @@ process NCHG_TRANS {
         path sample_sheet
 
     output:
-        path "*.tsv", emit: tsv
+        path outname, emit: tsv
 
     shell:
+        basename="$sample_sheet" - ~/\.ok\.tsv$/
+        outname="${basename}.nchg.trans.tsv"
         '''
-        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > sample_sheet.trans.nchg.tsv
+        printf 'sample\\thic_file\\tresolution\\tdomains\\tmask\\n' > '!{outname}'
         # Drop LADs column
         cut -f 1-4,7 '!{sample_sheet}' |
             tail -n +2 |
             perl -pe 's/^(.*?)\\t/\\1_trans\\t/' \\
-            >> sample_sheet.trans.nchg.tsv
+            >> '!{outname}'
         '''
 }
