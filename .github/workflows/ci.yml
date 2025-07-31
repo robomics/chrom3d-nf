@@ -40,13 +40,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  TEST_DATASET_URL: "https://zenodo.org/records/15579549/files/hictk_test_data.tar.zst?download=1"
-  TEST_DATASET_SHA256: "af98f7997852c4a896fb19f1084dd482b0136b7e3ced15b02bcf71ed96fb5573"
-  TEST_MATRIX: "test/data/cooler/4DNFIZ1ZVXC8.mcool"
-  NXF_ANSI_LOG: false
-  NXF_SYNTAX_PARSER: "v2"
-
 jobs:
   preproc-test-dataset:
     name: Preprocess test dataset
@@ -55,10 +48,13 @@ jobs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Generate cache key
         id: generate-cache-key
         run: |
-          key="test-dataset-$TEST_DATASET_SHA256"
+          key='test-dataset-${{ hashFiles('utils/download_example_datasets.sh') }}'
           echo "key=$key" >> $GITHUB_OUTPUT
 
       - name: Lookup cached test datasets
@@ -71,25 +67,7 @@ jobs:
 
       - name: Download test dataset
         if: steps.cache-dataset.outputs.cache-hit != 'true'
-        run: curl -L "$TEST_DATASET_URL" -o dataset.tar.zst
-
-      - name: Checksum test dataset
-        if: steps.cache-dataset.outputs.cache-hit != 'true'
-        run: |
-          echo "$TEST_DATASET_SHA256  dataset.tar.zst" > checksum.sha256
-          shasum -c checksum.sha256
-
-      - name: Prepare test datasets
-        if: steps.cache-dataset.outputs.cache-hit != 'true'
-        run: |
-          tar -xf dataset.tar.zst
-
-          mkdir staging
-          mv "$TEST_MATRIX" staging/
-
-          rm -rf test/data/
-          mkdir -p test/data
-          mv staging/* test/data/
+        run: utils/download_example_datasets.sh test/data/
 
       - name: Cache test datasets
         if: steps.cache-dataset.outputs.cache-hit != 'true'
@@ -114,6 +92,8 @@ jobs:
     env:
       HICTK_NO_TELEMETRY: "1"
       NCHG_NO_TELEMETRY: "1"
+      NXF_ANSI_LOG: false
+      NXF_SYNTAX_PARSER: "v2"
 
     steps:
       - name: Checkout repo
