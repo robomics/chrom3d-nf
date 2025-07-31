@@ -30,10 +30,10 @@ The workflow can be run in two ways:
 
 The samplesheet should be a TSV file with the following columns:
 
-| sample       | hic_file                                | resolution | domains  | periphery_constraints | mask_cis     | mask_trans     |
-| ------------ | --------------------------------------- | ---------- | -------- | --------------------- | ------------ | -------------- |
-| sample_name  | myfile.hic                              | 50000      | tads.bed | constraints.bed       | mask_cis.bed | mask_trans.bed |
-| 4DNFIZ1ZVXC8 | 4DNFIZ1ZVXC8.mcool::/resolutions/500000 | 500000     |          |                       |              |                |
+| sample       | hic_file           | resolution | domains  | periphery_constraints | mask_cis     | mask_trans     |
+| ------------ | ------------------ | ---------- | -------- | --------------------- | ------------ | -------------- |
+| sample_name  | myfile.hic         | 50000      | tads.bed | constraints.bed       | mask_cis.bed | mask_trans.bed |
+| 4DNFIZ1ZVXC8 | 4DNFIZ1ZVXC8.mcool | 500000     |          |                       |              |                |
 
 - **sample**: Sample names/ids. This field will be used as prefix to in the output file names (see [below](#running-the-workflow)).
 - **hic_file**: Path to a file in .hic or Cooler format.
