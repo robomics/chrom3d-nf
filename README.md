@@ -10,6 +10,8 @@ SPDX-License-Identifier: MIT
 
 This repository hosts a Nextflow workflow to generate 3D genome structures from Hi-C data using [Chrom3D](https://github.com/Chrom3D/Chrom3D).
 
+![Chrom3D genome models](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fnprot.2018.009/MediaObjects/41596_2018_Article_BFnprot2018009_Fig3_HTML.jpg?as=webp)
+
 ## Requirements
 
 ### Software requirements
