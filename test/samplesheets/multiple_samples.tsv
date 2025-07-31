@@ -1,3 +1,3 @@
 sample	hic_file	resolution	domains	periphery_constraints	mask_cis	mask_trans
-example_250000	test/data/4DNFIZ1ZVXC8.mcool	250000
-example_500000	test/data/4DNFIZ1ZVXC8.mcool	500000
+example_wo_periphery_constraints	test/data/4DNFIZ1ZVXC8.mcool	500000
+example_w_periphery_constraints	test/data/4DNFIZ1ZVXC8.mcool	500000		test/data/periphery_constraints.dm6.bed.gz
