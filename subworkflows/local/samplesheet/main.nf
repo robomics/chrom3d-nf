@@ -19,14 +19,14 @@ def parse_sample_sheet_row(row) {
   def files = [hic_fname]
 
   def domains = make_optional_input(row.domains)
-  def lads = make_optional_input(row.lads)
+  def periphery_constraints = make_optional_input(row.periphery_constraints)
   def mask_cis = make_optional_input(row.mask_cis)
   def mask_trans = make_optional_input(row.mask_trans)
 
   tuple(row.sample,
         files,
         domains,
-        lads,
+        periphery_constraints,
         mask_cis,
         mask_trans)
 }
@@ -40,7 +40,7 @@ workflow SAMPLESHEET {
     hic_file
     resolution
     domains
-    lads
+    periphery_constraints
     mask
 
   main:
@@ -61,7 +61,7 @@ workflow SAMPLESHEET {
         hic_file,
         resolution,
         domains ? domains : "",
-        lads ? lads : "",
+        periphery_constraints ? periphery_constraints : "",
         mask ? mask : ""
       )
 
@@ -110,7 +110,7 @@ process GENERATE {
     val hic_file
     val resolution
     val domains
-    val lads
+    val periphery_constraints
     val mask
 
   output:
@@ -126,13 +126,13 @@ process GENERATE {
       fi
     done
 
-    printf 'sample\\thic_file\\tresolution\\tdomains\\tlads\\tmask_cis\\tmask_trans\\n' > sample_sheet.tsv
+    printf 'sample\\thic_file\\tresolution\\tdomains\\tperiphery_constraints\\tmask_cis\\tmask_trans\\n' > sample_sheet.tsv
     printf '%s\\t%s\\t%s\\t%s\\t%s\\t%s\\t%s\\n' \\
            '$sample' \\
            '$hic_file' \\
            '$resolution' \\
            '$domains' \\
-           '$lads' \\
+           '$periphery_constraints' \\
            '$mask' \\
            '$mask' |
     tee -a sample_sheet.tsv

@@ -41,9 +41,9 @@ workflow PREPROCESSING {
     sample_sheet
       .splitCsv(sep: "\t", header: true)
       .map { row ->
-        tuple(row.sample, make_optional_input(row.lads))
+        tuple(row.sample, make_optional_input(row.periphery_constraints))
       }
-      .set { lads }
+      .set { periphery_constraints }
 
     sig_interactions_cis.join(sig_interactions_trans)
       .map { tuple(it[0], tuple(it[1], it[2])) }
@@ -79,7 +79,7 @@ workflow PREPROCESSING {
 
     DUMP_CHROM_SIZES.out.chrom_sizes
       .join(beads)
-      .join(lads)
+      .join(periphery_constraints)
       .join(MERGE.out.tsv)
       .set { make_bead_gtrack_tasks }
 
@@ -185,7 +185,7 @@ process MAKE_BEAD_GTRACK {
     tuple val(sample),
           path(chrom_sizes),
           path(beads),
-          path(lads),
+          path(periphery_constraints),
           path(sig_interactions)
 
     val masked_chromosomes
@@ -198,8 +198,8 @@ process MAKE_BEAD_GTRACK {
   script:
     outprefix="${sample}"
     args = []
-    if (!lads.toString().isEmpty()) {
-        args.push("--lads='${lads}'")
+    if (!periphery_constraints.toString().isEmpty()) {
+        args.push("--periphery-constraints='${periphery_constraints}'")
     }
     if (!masked_chromosomes.isEmpty()) {
         args.push("--masked-chromosomes='${masked_chromosomes}'")

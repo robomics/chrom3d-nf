@@ -26,7 +26,7 @@ workflow {
       log.info("-- hic_file: ${params.hic_file}")
       log.info("-- resolution: ${params.resolution}")
       log.info("-- beads: ${params.beads}")
-      log.info("-- lads: ${params.lads}")
+      log.info("-- periphery_constraints: ${params.periphery_constraints}")
       log.info("-- mask: ${params.mask}")
     }
     log.info("-- publish_dir_mode: ${params.publish_dir_mode}")
@@ -61,7 +61,7 @@ workflow {
       params.hic_file,
       params.resolution,
       params.beads,
-      params.lads,
+      params.periphery_constraints,
       params.mask
     )
 

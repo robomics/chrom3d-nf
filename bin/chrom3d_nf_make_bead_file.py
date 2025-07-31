@@ -37,9 +37,9 @@ def make_cli() -> argparse.ArgumentParser:
     )
 
     cli.add_argument(
-        "--lads",
+        "--periphery-constraints",
         type=existing_file,
-        help="Path to a BED3+ file with the list of LADs",
+        help="Path to a BED3+ file with the list of beads that should be located at the nuclear periphery (e.g. LADs).",
     )
 
     cli.add_argument(
@@ -70,13 +70,17 @@ def mask_chromosomes(df: pd.DataFrame | None, chroms: str) -> pd.DataFrame | Non
     return df
 
 
-def intersect_with_lads(beads: pd.DataFrame, lads: pd.DataFrame) -> pd.DataFrame:
-    df = bf.count_overlaps(beads, lads)
+def intersect_with_periphery_constraints(beads: pd.DataFrame, constraints: pd.DataFrame) -> pd.DataFrame:
+    df = bf.count_overlaps(beads, constraints)
     df.loc[df["count"] != 0, "periphery"] = "1"
     return df[beads.columns.tolist()]
 
 
-def generate_gtrack(beads: pd.DataFrame, sig_interactions: pd.DataFrame, lads: pd.DataFrame | None) -> pd.DataFrame:
+def generate_gtrack(
+    beads: pd.DataFrame,
+    sig_interactions: pd.DataFrame,
+    periphery_constraints: pd.DataFrame | None,
+) -> pd.DataFrame:
     records = {}
 
     for chrom1, start1, end1, chrom2, start2, end2 in sig_interactions.itertuples(index=False):
@@ -107,8 +111,8 @@ def generate_gtrack(beads: pd.DataFrame, sig_interactions: pd.DataFrame, lads: p
 
     beads = pd.DataFrame(data, columns=["chrom", "start", "end", "tid", "radius", "periphery", "edges"])
 
-    if lads is not None:
-        return intersect_with_lads(beads, lads)
+    if periphery_constraints is not None:
+        return intersect_with_periphery_constraints(beads, periphery_constraints)
 
     return beads
 
@@ -124,16 +128,18 @@ def main():
     )
     beads = import_beads(args["domains"], chrom_sizes)
 
-    lads = None
-    if args["lads"] is not None:
-        lads = pd.read_table(args["lads"], usecols=list(range(3)), names=["chrom", "start", "end"])
+    periphery_constraints = None
+    if args["periphery_constraints"] is not None:
+        periphery_constraints = pd.read_table(
+            args["periphery_constraints"], usecols=list(range(3)), names=["chrom", "start", "end"]
+        )
 
     if args["masked_chromosomes"] is not None:
         beads = mask_chromosomes(beads, args["masked_chromosomes"])
         sig_interactions = mask_chromosomes(sig_interactions, args["masked_chromosomes"])
-        lads = mask_chromosomes(lads, args["masked_chromosomes"])
+        periphery_constraints = mask_chromosomes(periphery_constraints, args["masked_chromosomes"])
 
-    beads = generate_gtrack(beads, sig_interactions, lads)
+    beads = generate_gtrack(beads, sig_interactions, periphery_constraints)
     beads = bf.sort_bedframe(beads, chrom_sizes)
 
     print("##gtrack version: 1.0")
