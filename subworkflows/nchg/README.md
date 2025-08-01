@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 # README
 
 The nchg subworkflow was downloaded from [github.com/paulsengroup/nchg-nf](https://github.com/paulsengroup/nchg-nf).
-The code was downloaded on July 30, 2025 (commit d31f6c1125e4c86c1d7ba32ccec13ec80f873e60).
+The code was downloaded on August 1, 2025 (commit baa1e600e56099574c8d6aa6cac76b29570a3f6f).
 
 The following changes have been made before checking in the code:
 
