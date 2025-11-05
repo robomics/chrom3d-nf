@@ -20,7 +20,7 @@ on:
 jobs:
   build-utils-dockerfile:
     name: Build utils Dockerfile
-    uses: robomics/chrom3d-nf/.github/workflows/build-dockerfile.yml@d78a0f312fc7272147f7edfb9245b1bf1f798e69
+    uses: robomics/chrom3d-nf/.github/workflows/build-dockerfile.yml@daa0016a57f2dc25247d5fbf306025f91b32a1d7
     with:
       dockerfile-glob: "containers/utils*.Dockerfile"
 
