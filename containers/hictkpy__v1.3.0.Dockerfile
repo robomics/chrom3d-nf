@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FROM python:3.13-slim AS base
+FROM python:3.14.2-slim AS base
 
 ARG CONTAINER_VERSION
 ARG CONTAINER_TITLE
